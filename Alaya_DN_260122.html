@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>艾萊亞的死亡紀錄</title>
+    <style>
+        /* CSS 樣式區域 */
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-red: #ff4d4d;
+            --border-color: #404040;
+            --hover-bg: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* 頂部計數器區塊 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+        }
+
+        .death-counter {
+            font-size: 5rem;
+            font-weight: bold;
+            color: var(--accent-red);
+            text-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* 列表區塊 */
+        #death-list {
+            list-style: none;
+        }
+
+        /* 卡片基本樣式 */
+        .death-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            transition: all 0.2s ease;
+            position: relative; /* 為了定位提示文字 */
+            text-decoration: none; /* 移除超連結底線 */
+            color: inherit; /* 繼承文字顏色 */
+        }
+
+        /* 有連結的卡片樣式 */
+        a.death-card {
+            cursor: pointer;
+        }
+
+        /* 滑鼠懸停效果 */
+        .death-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-red);
+        }
+        
+        a.death-card:hover {
+            background-color: var(--hover-bg);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .death-index {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-red);
+            margin-right: 20px;
+            min-width: 40px;
+        }
+
+        .death-content {
+            flex: 1;
+        }
+
+        .death-cause {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        /* 修改：將原本的 death-date 改為 death-source */
+        .death-source {
+            font-size: 0.85rem;
+            color: var(--accent-red); /* 讓出處稍微顯眼一點，使用紅色 */
+            margin-bottom: 10px;
+            display: block;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .death-desc {
+            font-size: 0.95rem;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+
+        /* 新增：閱讀更多提示文字 */
+        .read-more-hint {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--accent-red);
+            font-weight: bold;
+            opacity: 0.8;
+            text-align: right;
+        }
+
+        /* 讓箭頭有個小動畫 */
+        .read-more-hint span {
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        a.death-card:hover .read-more-hint span {
+            transform: translateX(3px);
+        }
+
+        /* 頁尾 */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>艾萊亞的總死亡次數</h1>
+            <div id="total-count" class="death-counter">0</div>
+            <p class="subtitle">以及那些充滿創意的死法</p>
+        </header>
+
+        <div id="death-list">
+            </div>
+
+        <footer>
+            &copy; <span id="year"></span> Morris inc.
+        </footer>
+    </div>
+
+    <script>
+        // JavaScript 邏輯區域
+
+        // --- 設定資料 ---
+        // 這裡將原本的 date 欄位替換為 from (出處)
+        const deathRecords = [
+            {
+                cause: "被槍擊導致的失血過多",
+                from: "《蠟燭與邪神》主線1-1",
+                description: "她被不知誰請來的混混綁架，又莫名其妙的死在了一處垃圾場。",
+                link: "https://docs.google.com/document/d/1TRA5MGjmewzRJGFXQd8930CWRbSnSIx_hwQo4jjLTNg/edit?usp=sharing"
+            },
+            {
+                cause: "電擊致死",
+                from: "《蠟燭與邪神》主線1-5",
+                description: "被憤怒的墨西哥毒梟抓住，左右腿各插了一隻金屬棒，電出的焦煙從耳朵竄出。",
+                link: "" 
+            }
+        ];
+
+        // --- 程式邏輯 ---
+
+        function renderSite() {
+            const listContainer = document.getElementById('death-list');
+            const countContainer = document.getElementById('total-count');
+            
+            // 更新總次數
+            countContainer.textContent = deathRecords.length;
+
+            // 倒序排列
+            const sortedRecords = deathRecords.slice().reverse();
+
+            let htmlContent = '';
+
+            sortedRecords.forEach((record, index) => {
+                const displayIndex = deathRecords.length - index;
+                
+                // 檢查是否有連結
+                const hasLink = record.link && record.link.trim() !== "";
+
+                // 根據是否有連結，決定使用 <a> 標籤還是 <div> 標籤
+                // 如果有連結，加上 target="_blank" 讓它開新分頁
+                const tagType = hasLink ? `a href="${record.link}" target="_blank"` : 'div';
+                
+                // 決定是否顯示「詳閱事件」提示
+                const hintHtml = hasLink 
+                    ? `<span class="read-more-hint">點擊詳閱事件紀錄 <span>→</span></span>` 
+                    : '';
+
+                // 修改重點：這裡使用 record.from 並套用 death-source 樣式
+                htmlContent += `
+                    <${tagType} class="death-card">
+                        <div class="death-index">#${displayIndex}</div>
+                        <div class="death-content">
+                            <div class="death-cause">${record.cause}</div>
+                            <span class="death-source">${record.from}</span>
+                            <p class="death-desc">${record.description}</p>
+                            ${hintHtml}
+                        </div>
+                    </${hasLink ? 'a' : 'div'}>
+                `;
+            });
+
+            listContainer.innerHTML = htmlContent;
+            document.getElementById('year').textContent = new Date().getFullYear();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderSite);
+
+    </script>
+</body>
+</html>
